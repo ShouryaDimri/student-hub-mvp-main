@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Ranking Algorithm Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            font-weight: bold;
+        }
+        .rank-1 { background-color: #fff3cd; }
+        .rank-2 { background-color: #e2e3e5; }
+        .rank-3 { background-color: #f8d7da; }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .category {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Ranking Algorithm Demonstration</h1>
+        
+        <div class="category">
+            <h2>Activity Categories and Weights</h2>
+            
+            <h3>Academic Achievements</h3>
+            <ul>
+                <li>Course completion with certificate → 7 points</li>
+                <li>High course score (>90%) → 12 points</li>
+                <li>Research paper publication (peer-reviewed) → 20 points</li>
+                <li>Patents filed / innovative project → 25 points</li>
+            </ul>
+            
+            <h3>Hackathons / Competitions</h3>
+            <ul>
+                <li>Hackathon participation → 5 points</li>
+                <li>Hackathon win → 10 points</li>
+                <li>National-level competition win → 15 points</li>
+                <li>International-level competition win → 20 points</li>
+            </ul>
+            
+            <h3>Faculty & Institutional Recognition</h3>
+            <ul>
+                <li>Approval by Dean → 15 points</li>
+                <li>Approval by Professor (for groundbreaking work only) → 10 points</li>
+                <li>Recommendation for external awards → 12 points</li>
+            </ul>
+            
+            <h3>Community & Leadership</h3>
+            <ul>
+                <li>Mentoring juniors / leading a student team → 8 points</li>
+                <li>Organizing workshops/events → 6 points</li>
+                <li>Volunteering for social projects → 5 points</li>
+            </ul>
+            
+            <h3>Online Engagement & Skill Growth</h3>
+            <ul>
+                <li>Completion of MOOCs (Coursera, edX, etc.) → 6 points each</li>
+                <li>AI/ML/Tech certifications (recognized platforms) → 10 points</li>
+                <li>Publishing blogs / open-source contributions → 8 points</li>
+            </ul>
+        </div>
+        
+        <h2>Tie-breaking Priority</h2>
+        <p>When students have the same total score, the following hierarchy is used:</p>
+        <ol>
+            <li>Patents/Research (25/20)</li>
+            <li>International wins (20)</li>
+            <li>Dean approval (15)</li>
+            <li>National wins (15)</li>
+            <li>Professor approval (10)</li>
+            <li>Hackathon win (10)</li>
+            <li>High course score (12)</li>
+            <li>Certifications (10)</li>
+            <li>Projects (8)</li>
+            <li>Course completion (7)</li>
+            <li>Hackathon participation (5)</li>
+        </ol>
+        
+        <h2>Sample Student Data</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Course Completion</th>
+                    <th>High Course Score</th>
+                    <th>Research Paper</th>
+                    <th>Patents</th>
+                    <th>Hackathon Participation</th>
+                    <th>Hackathon Win</th>
+                    <th>National Competition</th>
+                    <th>International Competition</th>
+                    <th>Dean Approval</th>
+                    <th>Professor Approval</th>
+                    <th>External Award</th>
+                    <th>Mentoring</th>
+                    <th>Organizing Events</th>
+                    <th>Volunteering</th>
+                    <th>MOOCs</th>
+                    <th>Certifications</th>
+                    <th>Open Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Alice</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Bob</td>
+                    <td>5</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Charlie</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Diana</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>Eve</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Score Calculations</h2>
+        
+        <h3>Alice's Score Calculation:</h3>
+        <pre>
+Course completion: 3 × 7 = 21
+High course score: 2 × 12 = 24
+Research paper: 1 × 20 = 20
+Hackathon participation: 2 × 5 = 10
+Hackathon win: 1 × 10 = 10
+Dean approval: 1 × 15 = 15
+Professor approval: 1 × 10 = 10
+External award: 1 × 12 = 12
+Mentoring: 2 × 8 = 16
+Organizing events: 1 × 6 = 6
+Volunteering: 3 × 5 = 15
+MOOCs: 2 × 6 = 12
+Certifications: 1 × 10 = 10
+Open source: 1 × 8 = 8
+Total Score: 185
+        </pre>
+        
+        <h3>Bob's Score Calculation:</h3>
+        <pre>
+Course completion: 5 × 7 = 35
+High course score: 1 × 12 = 12
+Patents: 1 × 25 = 25
+Hackathon participation: 3 × 5 = 15
+Hackathon win: 2 × 10 = 20
+National competition: 1 × 15 = 15
+Professor approval: 2 × 10 = 20
+Mentoring: 1 × 8 = 8
+Organizing events: 2 × 6 = 12
+Volunteering: 2 × 5 = 10
+MOOCs: 1 × 6 = 6
+Certifications: 2 × 10 = 20
+Open source: 1 × 8 = 8
+Total Score: 206
+        </pre>
+        
+        <h3>Charlie's Score Calculation:</h3>
+        <pre>
+Course completion: 2 × 7 = 14
+High course score: 3 × 12 = 36
+Research paper: 2 × 20 = 40
+International competition: 1 × 20 = 20
+Dean approval: 2 × 15 = 30
+Professor approval: 1 × 10 = 10
+External award: 3 × 12 = 36
+Organizing events: 1 × 6 = 6
+Volunteering: 4 × 5 = 20
+MOOCs: 3 × 6 = 18
+Open source: 1 × 8 = 8
+Total Score: 238
+        </pre>
+        
+        <h3>Diana's Score Calculation:</h3>
+        <pre>
+Course completion: 4 × 7 = 28
+High course score: 2 × 12 = 24
+Research paper: 1 × 20 = 20
+Patents: 1 × 25 = 25
+Hackathon participation: 2 × 5 = 10
+Hackathon win: 1 × 10 = 10
+National competition: 2 × 15 = 30
+International competition: 1 × 20 = 20
+Dean approval: 1 × 15 = 15
+Professor approval: 1 × 10 = 10
+External award: 2 × 12 = 24
+Mentoring: 3 × 8 = 24
+MOOCs: 2 × 6 = 12
+Certifications: 3 × 10 = 30
+Open source: 1 × 8 = 8
+Total Score: 290
+        </pre>
+        
+        <h3>Eve's Score Calculation:</h3>
+        <pre>
+Course completion: 1 × 7 = 7
+High course score: 1 × 12 = 12
+Patents: 2 × 25 = 50
+Hackathon participation: 1 × 5 = 5
+Hackathon win: 3 × 10 = 30
+National competition: 1 × 15 = 15
+International competition: 2 × 20 = 40
+Dean approval: 1 × 15 = 15
+External award: 1 × 12 = 12
+Mentoring: 1 × 8 = 8
+Organizing events: 3 × 6 = 18
+Volunteering: 2 × 5 = 10
+MOOCs: 1 × 6 = 6
+Certifications: 1 × 10 = 10
+Open source: 1 × 8 = 8
+Total Score: 246
+        </pre>
+        
+        <h2>Final Rankings</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Student</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="rank-1">
+                    <td>1</td>
+                    <td>Diana</td>
+                    <td>290</td>
+                </tr>
+                <tr class="rank-2">
+                    <td>2</td>
+                    <td>Eve</td>
+                    <td>246</td>
+                </tr>
+                <tr class="rank-3">
+                    <td>3</td>
+                    <td>Charlie</td>
+                    <td>238</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Bob</td>
+                    <td>206</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Alice</td>
+                    <td>185</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>How the Algorithm Works</h2>
+        <ol>
+            <li><strong>Input:</strong> A matrix where rows represent students and columns represent activity counts</li>
+            <li><strong>Weighting:</strong> Each activity is multiplied by its predefined weight</li>
+            <li><strong>Scoring:</strong> Weighted scores are summed to get a total score for each student</li>
+            <li><strong>Ranking:</strong> Students are sorted in descending order by total score</li>
+            <li><strong>Tie-breaking:</strong> When students have equal scores, priority is given based on the hierarchy above</li>
+        </ol>
+    </div>
+</body>
+</html>
