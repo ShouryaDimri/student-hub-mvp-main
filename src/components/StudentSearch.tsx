@@ -17,6 +17,7 @@ interface Student {
   college?: string;
   year_of_study?: number;
   bio?: string;
+  achievement_points?: number;
   skills: Array<{
     skill_name: string;
     proficiency_level: string;
@@ -47,22 +48,14 @@ export function StudentSearch() {
 
   const fetchStudents = async () => {
     try {
-      const { data, error } = await supabase
+      // Use the same approach as PlacementDashboard
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select(`
-          id,
-          full_name,
-          email,
-          department,
-          college,
-          year_of_study,
-          bio,
-          student_skills (
-            proficiency_level,
-            skills (
-              name,
-              category
-            )
+          *,
+          student_skills(
+            skills(name, category),
+            proficiency_level
           )
         `)
         .eq('user_type', 'student')
@@ -70,30 +63,44 @@ export function StudentSearch() {
 
       if (error) throw error;
 
-      const formattedStudents = data?.map(student => ({
-        ...student,
-        skills: student.student_skills?.map(ss => ({
-          skill_name: ss.skills?.name || '',
-          proficiency_level: ss.proficiency_level,
-          category: ss.skills?.category || ''
-        })) || []
-      })) || [];
+      // Get achievement points for each student
+      const studentsWithPoints = await Promise.all(
+        (data || []).map(async (student: any) => {
+          const { data: pointsData } = await supabase
+            .from('documents')
+            .select('points_awarded')
+            .eq('student_id', student.id)
+            .eq('status', 'approved');
 
-      setStudents(formattedStudents);
+          const totalPoints = pointsData?.reduce((sum, doc) => sum + (doc.points_awarded || 0), 0) || 0;
 
-      // Extract unique departments, colleges, and skills
+          const skills = student.student_skills?.map((ss: any) => ({
+            skill_name: ss.skills?.name || '',
+            proficiency_level: ss.proficiency_level,
+            category: ss.skills?.category || ''
+          })) || [];
+
+          return {
+            ...student,
+            skills,
+            achievement_points: totalPoints
+          };
+        })
+      );
+
+      setStudents(studentsWithPoints);
+
+      // Extract unique values for filters
       const uniqueDepartments = [...new Set(
-        data?.map(s => s.department).filter(Boolean)
+        studentsWithPoints.map(s => s.department).filter(Boolean)
       )] as string[];
       
       const uniqueColleges = [...new Set(
-        data?.map(s => s.college).filter(Boolean)
+        studentsWithPoints.map(s => s.college).filter(Boolean)
       )] as string[];
       
       const uniqueSkills = [...new Set(
-        data?.flatMap(s => 
-          s.student_skills?.map(ss => ss.skills?.name).filter(Boolean)
-        )
+        studentsWithPoints.flatMap(s => s.skills.map(skill => skill.skill_name).filter(Boolean))
       )] as string[];
 
       setDepartments(uniqueDepartments);
@@ -137,6 +144,14 @@ export function StudentSearch() {
         student.skills.some(skill => skill.skill_name === selectedSkill)
       );
     }
+
+    // Sort by achievement points (descending) and then by name
+    filtered.sort((a, b) => {
+      if (b.achievement_points !== a.achievement_points) {
+        return (b.achievement_points || 0) - (a.achievement_points || 0);
+      }
+      return a.full_name.localeCompare(b.full_name);
+    });
 
     setFilteredStudents(filtered);
   };
