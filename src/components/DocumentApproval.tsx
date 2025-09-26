@@ -34,10 +34,29 @@ export function DocumentApproval() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [facultyProfile, setFacultyProfile] = useState<any>(null);
 
   useEffect(() => {
-    fetchPendingDocuments();
-  }, []);
+    if (user) {
+      fetchFacultyProfile();
+      fetchPendingDocuments();
+    }
+  }, [user]);
+
+  const fetchFacultyProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, user_type')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error) throw error;
+      setFacultyProfile(data);
+    } catch (error) {
+      console.error('Error fetching faculty profile:', error);
+    }
+  };
 
   const fetchPendingDocuments = async () => {
     try {
@@ -67,11 +86,16 @@ export function DocumentApproval() {
     setActionLoading(documentId);
 
     try {
+      // Ensure we have the faculty profile ID
+      if (!facultyProfile?.id) {
+        throw new Error('Faculty profile not found. Please refresh the page.');
+      }
+
       const { error } = await supabase
         .from('documents')
         .update({
           status: approved ? 'approved' : 'rejected',
-          approved_by: user?.id,
+          approved_by: facultyProfile.id, // Use profile ID instead of user ID
           approved_at: new Date().toISOString(),
           ...(reason && { rejection_reason: reason }),
           ...(approved && points && { points_awarded: points }),
@@ -103,11 +127,13 @@ export function DocumentApproval() {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  if (loading) {
+  if (loading || !facultyProfile) {
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-2 text-muted-foreground">Loading pending documents...</p>
+        <p className="mt-2 text-muted-foreground">
+          {loading ? 'Loading pending documents...' : 'Loading faculty profile...'}
+        </p>
       </div>
     );
   }

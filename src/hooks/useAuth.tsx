@@ -40,7 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, userData: { full_name: string; user_type: string; college?: string; organization?: string }) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Force production URL for email confirmation redirects
+    const isProduction = window.location.hostname !== 'localhost';
+    const redirectUrl = isProduction ? window.location.origin + '/' : `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -66,7 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = `${window.location.origin}/auth?mode=reset`;
+    // Force production URL for password reset redirects
+    const isProduction = window.location.hostname !== 'localhost';
+    const redirectUrl = isProduction ? window.location.origin + '/auth?mode=reset' : `${window.location.origin}/auth?mode=reset`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl

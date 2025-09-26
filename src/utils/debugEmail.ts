@@ -15,7 +15,7 @@ export const debugEmailSignup = async (email: string, password = 'TestPass123!')
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/`,
+        emailRedirectTo: window.location.hostname !== 'localhost' ? window.location.origin + '/' : `${window.location.origin}/`,
         data: {
           full_name: 'Test User',
           user_type: 'student'
