@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { MapPin, BookOpen, User, Eye, GraduationCap } from "lucide-react";
+import { MapPin, BookOpen, User, Eye, GraduationCap, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StudentProfile {
@@ -12,6 +12,7 @@ interface StudentProfile {
   college?: string;
   year_of_study?: number;
   bio?: string;
+  achievement_points?: number;
   skills: Array<{
     skill_name: string;
     proficiency_level: string;
@@ -58,9 +59,19 @@ export const StudentProfileCard = ({ student, onViewProfile }: StudentProfileCar
           </div>
           
           <div className="flex-1 min-w-0 space-y-1">
-            <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors duration-300">
-              {student.full_name}
-            </h3>
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors duration-300">
+                {student.full_name}
+              </h3>
+              {typeof student.achievement_points === 'number' && (
+                <div className="flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-full border border-yellow-200 dark:border-yellow-700">
+                  <Trophy className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
+                  <span className="text-xs font-bold text-yellow-700 dark:text-yellow-300">
+                    {student.achievement_points}
+                  </span>
+                </div>
+              )}
+            </div>
             
             {student.department && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
