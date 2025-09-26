@@ -53,16 +53,21 @@ export function CollaborationRequests({ profile }: CollaborationRequestsProps) {
     if (!profile) return;
 
     try {
+      // Debug: Check what profile data we have
+      console.log('Fetching requests for profile:', profile);
+      
       const { data, error } = await supabase
         .from('collaboration_requests')
         .select(`
           *,
-          requester_profile:profiles!collaboration_requests_requester_id_fkey(id, full_name, user_type, department),
-          requested_profile:profiles!collaboration_requests_requested_id_fkey(id, full_name, user_type, department)
+          requester_profile:profiles!requester_id(id, full_name, user_type, department),
+          requested_profile:profiles!requested_id(id, full_name, user_type, department)
         `)
         .or(`requester_id.eq.${profile.id},requested_id.eq.${profile.id}`)
         .order('created_at', { ascending: false });
 
+      console.log('Collaboration requests query result:', { data, error });
+      
       if (error) throw error;
       setRequests((data as any) || []);
     } catch (error) {
@@ -109,8 +114,16 @@ export function CollaborationRequests({ profile }: CollaborationRequestsProps) {
     const projectDescription = formData.get('projectDescription') as string;
     const selectedSkills = JSON.parse(formData.get('skills') as string || '[]');
 
+    console.log('Creating collaboration request:', {
+      requester_id: profile.id,
+      requested_id: requestedId,
+      project_title: projectTitle,
+      project_description: projectDescription,
+      skills_needed: selectedSkills
+    });
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('collaboration_requests')
         .insert({
           requester_id: profile.id,
@@ -118,7 +131,10 @@ export function CollaborationRequests({ profile }: CollaborationRequestsProps) {
           project_title: projectTitle,
           project_description: projectDescription,
           skills_needed: selectedSkills
-        });
+        })
+        .select();
+
+      console.log('Insert result:', { data, error });
 
       if (error) throw error;
 
@@ -130,6 +146,7 @@ export function CollaborationRequests({ profile }: CollaborationRequestsProps) {
       setShowCreateDialog(false);
       fetchRequests();
     } catch (error: any) {
+      console.error('Error creating collaboration request:', error);
       toast({
         variant: "destructive",
         title: "Error",
