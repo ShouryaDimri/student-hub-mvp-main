@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, GraduationCap, Building } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Auth = () => {
   const { user, signIn, signUp, resetPassword, loading } = useAuth();
@@ -140,6 +141,12 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 py-4 sm:py-6 lg:py-12 px-4 auth-container">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        
+        {/* Theme Toggle - Fixed Position */}
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle />
+        </div>
+        
         <div className="max-w-md w-full space-y-4 sm:space-y-6 relative">
           <Card className="glass-effect border-2 card-hover animate-fade-in auth-card">
             <CardHeader className="pb-3 sm:pb-4">
@@ -191,6 +198,12 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 py-4 sm:py-6 lg:py-12 px-4 auth-container">
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       <div className="max-w-md w-full space-y-4 sm:space-y-6 relative">
         <div className="text-center animate-fade-in auth-header">
           <div className="flex justify-center mb-3 sm:mb-4">

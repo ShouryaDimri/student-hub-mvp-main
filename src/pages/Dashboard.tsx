@@ -14,6 +14,7 @@ import { AnalyticsDashboard } from '@/components/AnalyticsDashboard';
 import { ResumeGenerator } from '@/components/ResumeGenerator';
 import { DebugInfo } from '@/components/DebugInfo';
 import { LogOut, User, Upload, Search, CheckSquare, Users, TrendingUp, FileText } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface Profile {
   id: string;
@@ -116,14 +117,17 @@ export default function Dashboard() {
               Welcome back, <span className="text-foreground">{profile?.full_name || user.email}</span>
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={signOut} 
-            className="hover:bg-destructive hover:text-destructive-foreground transition-all duration-300 border-2 hover:scale-105"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button 
+              variant="outline" 
+              onClick={signOut} 
+              className="hover:bg-destructive hover:text-destructive-foreground transition-all duration-300 border-2 hover:scale-105"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 

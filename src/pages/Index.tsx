@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { GraduationCap, Users, Upload, CheckSquare, ArrowRight, Sparkles, Shield, Zap } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -28,6 +29,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5">
+      {/* Theme Toggle - Fixed Position */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+      
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
