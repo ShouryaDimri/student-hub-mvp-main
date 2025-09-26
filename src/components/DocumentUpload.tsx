@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { Upload, File, Clock, CheckCircle, XCircle, Download } from 'lucide-react';
+import { Upload, File, Clock, CheckCircle, XCircle, Download, Trash2 } from 'lucide-react';
 
 interface Document {
   id: string;
@@ -37,6 +37,7 @@ export function DocumentUpload({ profile }: DocumentUploadProps) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -165,6 +166,61 @@ export function DocumentUpload({ profile }: DocumentUploadProps) {
       });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (documentId: string, fileUrl: string) => {
+    if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
+      return;
+    }
+
+    setDeleting(documentId);
+    
+    try {
+      // Extract the file path from the URL for storage deletion
+      const url = new URL(fileUrl);
+      const pathParts = url.pathname.split('/');
+      const filePath = pathParts.slice(-2).join('/'); // Get user_id/filename
+      
+      console.log('🗑️ Deleting document:', { documentId, filePath });
+      
+      // Delete from database first
+      const { error: dbError } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', documentId);
+        
+      if (dbError) {
+        console.error('❌ Database delete error:', dbError);
+        throw dbError;
+      }
+      
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('documents')
+        .remove([filePath]);
+        
+      if (storageError) {
+        console.warn('⚠️ Storage delete error (file may not exist):', storageError);
+        // Don't throw here as the database record is already deleted
+      }
+      
+      toast({
+        title: "Document deleted",
+        description: "Your document has been successfully deleted.",
+      });
+      
+      // Refresh the documents list
+      fetchDocuments();
+    } catch (error: any) {
+      console.error('❌ Delete operation failed:', error);
+      toast({
+        variant: "destructive",
+        title: "Delete failed",
+        description: error.message || "Failed to delete the document.",
+      });
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -300,8 +356,23 @@ export function DocumentUpload({ profile }: DocumentUploadProps) {
                         variant="outline"
                         size="sm"
                         onClick={() => window.open(doc.file_url, '_blank')}
+                        title="Download document"
                       >
                         <Download className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteDocument(doc.id, doc.file_url)}
+                        disabled={deleting === doc.id}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        title="Delete document"
+                      >
+                        {deleting === doc.id ? (
+                          <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-600 border-t-transparent" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
                       </Button>
                     </div>
                   </div>
